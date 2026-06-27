@@ -1,5 +1,9 @@
 <?php
 
+use App\Enums\ContactPreference;
+use App\Enums\TicketCategory;
+use App\Enums\TicketPriority;
+use App\Enums\TicketStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,23 +17,15 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            id.
-public ticket number.
-            title.
-            description.
-            category.
-            priority.
-            status.
-            customer id.
-            booked support date/time.
-            contact preference.
-            created at.
-            updated at.
             $table->unsignedBigInteger('customer_id');
             $table->unsignedInteger('ticket_number');
             $table->string('title');
             $table->text('description');
-            $table->enum('category');
+            $table->enum('category', TicketCategory::values());
+            $table->enum('priority', TicketPriority::values());
+            $table->enum('status', TicketStatus::values());
+            $table->dateTime('booked_at');
+            $table->enum('contact_preference', ContactPreference::values());
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('users');
