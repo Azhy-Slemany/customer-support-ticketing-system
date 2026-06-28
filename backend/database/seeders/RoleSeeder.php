@@ -13,6 +13,9 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Clear the cache as spatie permission caches permissions that results in error
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         $admin = Role::findOrCreate('admin');
         $admin->givePermissionTo([
             'users.create',
