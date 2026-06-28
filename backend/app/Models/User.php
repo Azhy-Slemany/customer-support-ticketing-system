@@ -19,6 +19,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasApiTokens, HasRoles, Notifiable;
 
+    // Permissions package default guard configuration
+    protected string $guard_name = 'api';
+    protected function getDefaultGuardName(): string { return $this->guard_name; }
+
     /**
      * Get the attributes that should be cast.
      *
