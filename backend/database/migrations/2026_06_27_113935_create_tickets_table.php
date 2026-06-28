@@ -18,7 +18,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id');
-            $table->unsignedInteger('ticket_number');
+            $table->unsignedInteger('ticket_number')->unique();
             $table->string('title');
             $table->text('description');
             $table->enum('category', TicketCategory::values());
