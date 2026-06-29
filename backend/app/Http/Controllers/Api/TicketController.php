@@ -125,9 +125,8 @@ class TicketController extends Controller
         return $this->successResponse($id, 'Ticket deleted successfully.');
     }
 
-    public function createComment(Request $request) {
+    public function createComment(Request $request, int $ticketId) {
         $validator = Validator::make($request->all(), [
-            'ticket_id' => 'required|integer|exists:tickets,id',
             'description' => 'required|max:10000',
         ]);
         if ($validator->fails()) {
@@ -136,7 +135,7 @@ class TicketController extends Controller
 
         $validated = $validator->validated();
 
-        $ticket = Ticket::find($validated['ticket_id']);
+        $ticket = Ticket::find($ticketId);
         $user = $request->user();
         if ($user->hasExactRoles('customer') && $ticket->customer_id != $user->id) {
             return $this->errorResponse("Unauthorized", statusCode: 401);
