@@ -85,6 +85,10 @@ class TicketController extends Controller
         if (!$ticket) {
             return $this->errorResponse('Ticket not found', statusCode: 404);
         }
+        $user = $request->user();
+        if ($user->hasExactRoles('customer') && $ticket->customer_id != $user->id) {
+            return $this->errorResponse("Unauthorized", statusCode: 401);
+        }
 
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
@@ -124,16 +128,23 @@ class TicketController extends Controller
     public function createComment(Request $request) {
         $validator = Validator::make($request->all(), [
             'ticket_id' => 'required|integer|exists:tickets,id',
-            'title' => 'required|max:256',
             'description' => 'required|max:10000',
         ]);
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator);
         }
+
         $validated = $validator->validated();
 
         $ticket = Ticket::find($validated['ticket_id']);
+        $user = $request->user();
+        if ($user->hasExactRoles('customer') && $ticket->customer_id != $user->id) {
+            return $this->errorResponse("Unauthorized", statusCode: 401);
+        }
 
-        return $this->successResponse($ticket, 'Comment posted successfully.', statusCode: 201);
+        $comment = $ticket->comments()
+            ->create(array_merge($validated, ['user_id' => $request->user()->id]));
+
+        return $this->successResponse($comment, 'Comment posted successfully.', statusCode: 201);
     }
 }
