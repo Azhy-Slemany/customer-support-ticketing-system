@@ -56,7 +56,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-        ]);
+        ])->assignRole('customer');
 
         return $this->successResponse([
             'token' => $user->createToken('auth-token')->plainTextToken,
