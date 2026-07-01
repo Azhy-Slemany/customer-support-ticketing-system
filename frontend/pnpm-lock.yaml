@@ -20,6 +20,9 @@ importers:
       axios:
         specifier: ^1.18.1
         version: 1.18.1
+      dayjs:
+        specifier: ^1.11.21
+        version: 1.11.21
       js-cookie:
         specifier: ^3.0.8
         version: 3.0.8
