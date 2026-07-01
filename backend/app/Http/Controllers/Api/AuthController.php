@@ -29,16 +29,9 @@ class AuthController extends Controller
             ]);
         }
 
-        return $this->successResponse([
-            'token' => $user->createToken('auth-token')->plainTextToken,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles->pluck('name')->toArray(),
-                'permissions' => $user->permissions->pluck('name')->toArray(),
-            ],
-        ]);
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return $this->successResponse($this->userResponse($user, $token));
     }
 
     public function logout(Request $request)
@@ -66,16 +59,9 @@ class AuthController extends Controller
         ])->assignRole('customer');
         $user->refresh();
 
-        return $this->successResponse([
-            'token' => $user->createToken('auth-token')->plainTextToken,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles->pluck('name')->toArray(),
-                'permissions' => $user->permissions->pluck('name')->toArray(),
-            ],
-        ]);
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return $this->successResponse($this->userResponse($user, $token), statusCode: 201);
     }
 
     public function refreshToken(Request $request)
@@ -88,6 +74,24 @@ class AuthController extends Controller
 
     public function getUser(Request $request)
     {
-        return $this->successResponse($request->user());
+        return $this->successResponse($this->userResponse($request->user()));
+    }
+
+    private function userResponse(User $user, ?string $token = null) {
+        $data = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name')->toArray(),
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ],
+        ];
+
+        if ($token) {
+            $data['token'] = $token;
+        }
+
+        return $data;
     }
 }
