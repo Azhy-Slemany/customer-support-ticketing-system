@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/router' // pages router uses next/router
+import { useRouter } from 'next/router'
 import { Form, Input, Button, Alert, Typography } from 'antd'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { useAuth } from '@/context/AuthContext'
@@ -9,10 +9,15 @@ import { useAuth } from '@/context/AuthContext'
 const { Title } = Typography
 
 export default function LoginPage() {
-    const { login, isAgent } = useAuth()
+    const { login, isAgent, user } = useAuth()
     const router = useRouter()
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
+
+    if (user) {
+        router.replace(isAgent() ? '/agent' : '/customer')
+        return null
+    }
 
     const onFinish = async (values: { email: string; password: string }) => {
         setLoading(true)
