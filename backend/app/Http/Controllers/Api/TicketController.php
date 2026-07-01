@@ -24,9 +24,12 @@ class TicketController extends Controller
 
         $user = $request->user();
         if ($user->hasRole(["admin", "support"])) {
-            return Ticket::paginate(perPage: $perPage, page: $page);
+            return Ticket::with(['customer'])
+                ->paginate(perPage: $perPage, page: $page);
         } elseif ($user->hasRole("customer")) {
-            return Ticket::where('customer_id', $user->id)->paginate(perPage: $perPage, page: $page);
+            return Ticket::with(['customer'])
+                ->where('customer_id', $user->id)
+                ->paginate(perPage: $perPage, page: $page);
         }
         return $this->errorResponse("Unauthorized", statusCode: 401);
     }
