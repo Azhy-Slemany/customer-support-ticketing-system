@@ -21,7 +21,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->with(['roles', 'permissions'])->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -31,6 +31,13 @@ class AuthController extends Controller
 
         return $this->successResponse([
             'token' => $user->createToken('auth-token')->plainTextToken,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name')->toArray(),
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ],
         ]);
     }
 
@@ -57,9 +64,17 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ])->assignRole('customer');
+        $user->refresh();
 
         return $this->successResponse([
             'token' => $user->createToken('auth-token')->plainTextToken,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name')->toArray(),
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ],
         ]);
     }
 
