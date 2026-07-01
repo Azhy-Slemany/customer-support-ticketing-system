@@ -10,7 +10,7 @@ class Ticket extends Model
 {
     protected $guarded = [];
 
-    public function user(): BelongsTo
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
