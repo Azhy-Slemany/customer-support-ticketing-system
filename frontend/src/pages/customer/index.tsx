@@ -1,7 +1,17 @@
-export default function CustomerDashboardPage() {
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { Spin } from 'antd'
+
+export default function CustomerIndexPage() {
+    const router = useRouter()
+
+    useEffect(() => {
+        router.replace('/customer/tickets')
+    }, [router])
+
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <h1 className="text-3xl font-bold">Customer Dashboard</h1>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Spin size="large" />
         </div>
-    );
+    )
 }
