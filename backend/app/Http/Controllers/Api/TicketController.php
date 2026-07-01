@@ -32,7 +32,12 @@ class TicketController extends Controller
     }
 
     public function getTicket(Request $request, $id) {
-        $ticket = Ticket::with('customer')->find($id);
+        $ticket = Ticket::with([
+            'customer',
+            'comments',
+            'comments.user',
+            'comments.user.roles'
+        ])->find($id);
         if (!$ticket) {
             return $this->errorResponse('ticket not found', statusCode: 404);
         }
