@@ -3,12 +3,24 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import api from '@/lib/axios'
+import { ROLES_ADMIN, ROLES_SUPPORT, ROLES_CUSTOMER } from '@/lib/constants'
+
+interface AuthResponse {
+    status: string
+    message: string
+    data: {
+        token: string | undefined
+        user: User
+    }
+    errors: Map<string, string> | null
+}
 
 interface User {
     id: number
     name: string
     email: string
     roles: string[]
+    permissions: string[]
 }
 
 interface AuthContextType {
@@ -30,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const token = Cookies.get('token')
         if (token) {
-            api.get('/me')
-                .then((res) => setUser(res.data))
+            api.get<AuthResponse>('/me')
+                .then((res) => setUser(res.data.data.user))
                 .catch(() => Cookies.remove('token'))
                 .finally(() => setLoading(false))
         } else {
@@ -40,11 +52,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     const login = async (email: string, password: string) => {
-        const res = await api.post('/auth/login', { email, password })
-        const { token, user } = res.data
-        // Store token in cookie (httpOnly not possible client-side, but fine for this challenge)
-        Cookies.set('token', token, { expires: 7 })
-        setUser(user)
+        const res = await api.post<AuthResponse>('/auth/login', { email, password })
+        const { data } = res.data
+
+        // Store token in cookie
+        try {
+            if (!data.token) {
+                throw new Error('Token is undefined')
+            }
+            Cookies.set('token', data.token, { expires: 7 })
+        } catch (error) {
+            console.error('Error setting token in cookies:', error)
+        }
+        setUser(data.user)
     }
 
     const logout = async () => {
@@ -53,9 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
     }
 
-    // Helper role checks used throughout the app
-    const isAgent = () => user?.roles?.some(r => ['admin', 'support'].includes(r)) ?? false
-    const isCustomer = () => user?.roles?.includes('customer') ?? false
+    // Helpers
+    const isAgent = () => user?.roles?.some(r => [ROLES_ADMIN, ROLES_SUPPORT].includes(r)) ?? false
+    const isCustomer = () => user?.roles?.includes(ROLES_CUSTOMER) ?? false
 
     return (
         <AuthContext.Provider value={{ user, loading, login, logout, isAgent, isCustomer }}>
