@@ -23,7 +23,7 @@ export type ContactPreference = 'email' | 'phone'
 
 export interface Ticket {
     id: number
-    ticket_number: string
+    ticket_number: number
     title: string
     description: string
     category: TicketCategory
