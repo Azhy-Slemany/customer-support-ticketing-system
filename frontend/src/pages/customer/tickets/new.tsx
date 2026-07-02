@@ -138,7 +138,7 @@ export default function NewTicketPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="form-two-col">
                         <Form.Item
                             name="booked_at"
-                            label={<span style={{ fontSize: 12, fontWeight: 700, color: '#687382' }}>BOOK SUPPORT DATE & TIME <span style={{ fontWeight: 400 }}>(optional)</span></span>}
+                            label={<span style={{ fontSize: 12, fontWeight: 700, color: '#687382' }}>BOOK SUPPORT DATE & TIME</span>}
                         >
                             <DatePicker
                                 showTime
