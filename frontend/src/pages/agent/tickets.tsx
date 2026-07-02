@@ -4,12 +4,12 @@ import {
     Table, Input, Select, Typography, DatePicker, Empty, Spin, Space
 } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import dayjs from 'dayjs'
 import AppLayout from '@/components/AppLayout'
 import { StatusBadge, PriorityBadge } from '@/components/Badges'
 import api from '@/lib/axios'
-import type { Ticket, TicketStatus, TicketPriority, TicketCategory } from '@/types'
+import type { Ticket, TicketStatus, TicketPriority, TicketCategory, PaginatedData } from '@/types'
 import relativeTime from "dayjs/plugin/relativeTime"
 
 dayjs.extend(relativeTime);
@@ -22,6 +22,12 @@ export default function AgentQueuePage() {
 
     const [tickets, setTickets] = useState<Ticket[]>([])
     const [loading, setLoading] = useState(true)
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 20,
+        total: 0,
+        last_page: 1,
+    })
     const [error, setError] = useState<string | null>(null)
 
     // Filter state
@@ -31,17 +37,15 @@ export default function AgentQueuePage() {
     const [priorityFilter, setPriorityFilter] = useState<TicketPriority | ''>('')
     const [bookedDate, setBookedDate] = useState<string>('')
 
-    useEffect(() => {
-        fetchTickets()
-    }, [search, statusFilter, categoryFilter, priorityFilter, bookedDate])
-
-    const fetchTickets = async () => {
+    const fetchTickets = async (page = 1, pageSize = 20) => {
         setLoading(true)
         setError(null)
         try {
             // "open" is a convenience filter the backend maps to Open
-            const res = await api.get<{ data: Ticket[] }>('/tickets', {
+            const res = await api.get<PaginatedData<Ticket>>('/tickets', {
                 params: {
+                    page,
+                    per_page: pageSize,
                     search: search || undefined,
                     status: statusFilter || undefined,
                     category: categoryFilter || undefined,
@@ -50,12 +54,28 @@ export default function AgentQueuePage() {
                 },
             })
             setTickets(res.data.data)
+            setPagination((prev) => ({ ...prev, total: res.data.total, last_page: res.data.last_page }))
         } catch {
             setError('Failed to load the queue. Please refresh.')
         } finally {
             setLoading(false)
         }
     }
+
+    const handleTableChange = (newPagination: TablePaginationConfig) => {
+        setPagination((prev) => ({
+            ...prev,
+            current: newPagination.current ?? prev.current,
+            pageSize: newPagination.pageSize ?? prev.pageSize,
+        }));
+
+        fetchTickets(newPagination.current ?? 1, newPagination.pageSize ?? 20)
+    }
+
+    useEffect(() => {
+        setPagination((prev) => ({ ...prev, current: 1 })) // Reset to first page on filter change
+        fetchTickets(1, pagination.pageSize)
+    }, [search, statusFilter, categoryFilter, priorityFilter, bookedDate])
 
     const columns: ColumnsType<Ticket> = [
         {
@@ -68,7 +88,7 @@ export default function AgentQueuePage() {
                     <Text style={{ fontSize: 13 }}>{record.title}</Text>
                 </div>
             ),
-            sorter: (a, b) => a.ticket_number.localeCompare(b.ticket_number),
+            sorter: (a, b) => a.ticket_number - b.ticket_number,
         },
         {
             title: 'Customer',
@@ -188,6 +208,7 @@ export default function AgentQueuePage() {
                 <Table
                     columns={columns}
                     dataSource={tickets}
+                    onChange={handleTableChange}
                     rowKey="id"
                     loading={loading}
                     locale={{
@@ -200,7 +221,14 @@ export default function AgentQueuePage() {
                         style: { cursor: 'pointer' },
                     })}
                     style={{ background: '#fff', borderRadius: 8, border: '1px solid #d9e0e8' }}
-                    pagination={{ pageSize: 20, showTotal: (total) => `${total} tickets` }}
+                    pagination={{
+                        current: pagination.current,
+                        pageSize: pagination.pageSize,
+                        total: pagination.total,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['10', '20', '50'],
+                        showTotal: (total, range) => `${range[0]}–${range[1]} of ${total} tickets`,
+                    }}
                 />
             )}
 

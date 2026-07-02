@@ -4,12 +4,12 @@ import {
     Table, Input, Select, Button, Typography, Space, DatePicker, Empty, Spin
 } from 'antd'
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import dayjs from 'dayjs'
 import AppLayout from '@/components/AppLayout'
 import { StatusBadge, PriorityBadge } from '@/components/Badges'
 import api from '@/lib/axios'
-import type { Ticket, TicketStatus, TicketPriority, TicketCategory } from '@/types'
+import type { Ticket, TicketStatus, TicketPriority, TicketCategory, PaginatedData } from '@/types'
 import relativeTime from "dayjs/plugin/relativeTime"
 
 dayjs.extend(relativeTime);
@@ -22,6 +22,12 @@ export default function CustomerTicketsPage() {
 
     const [tickets, setTickets] = useState<Ticket[]>([])
     const [loading, setLoading] = useState(true)
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 20,
+        total: 0,
+        last_page: 1,
+    })
     const [error, setError] = useState<string | null>(null)
 
     // Filter state — all optional, empty string means "show all"
@@ -31,12 +37,14 @@ export default function CustomerTicketsPage() {
     const [priorityFilter, setPriorityFilter] = useState<TicketPriority | ''>('')
     const [bookedDate, setBookedDate] = useState<string>('')
 
-    const fetchTickets = async () => {
+    const fetchTickets = async (page = 1, pageSize = 20) => {
         setLoading(true)
         setError(null)
         try {
-            const res = await api.get<{ data: Ticket[] }>('/tickets', {
+            const res = await api.get<PaginatedData<Ticket>>('/tickets', {
                 params: {
+                    page,
+                    per_page: pageSize,
                     search: search || undefined,
                     status: statusFilter || undefined,
                     category: categoryFilter || undefined,
@@ -45,6 +53,7 @@ export default function CustomerTicketsPage() {
                 },
             })
             setTickets(res.data.data)
+            setPagination((prev) => ({ ...prev, total: res.data.total, last_page: res.data.last_page }))
         } catch {
             setError('Failed to load tickets. Please try again.')
         } finally {
@@ -52,8 +61,19 @@ export default function CustomerTicketsPage() {
         }
     }
 
+    const handleTableChange = (newPagination: TablePaginationConfig) => {
+        setPagination((prev) => ({
+            ...prev,
+            current: newPagination.current ?? prev.current,
+            pageSize: newPagination.pageSize ?? prev.pageSize,
+        }));
+
+        fetchTickets(newPagination.current ?? 1, newPagination.pageSize ?? 20)
+    }
+
     useEffect(() => {
-        fetchTickets()
+        setPagination((prev) => ({ ...prev, current: 1 })) // Reset to first page on filter change
+        fetchTickets(1, pagination.pageSize)
     }, [search, statusFilter, categoryFilter, priorityFilter, bookedDate])
 
     const columns: ColumnsType<Ticket> = [
@@ -170,6 +190,7 @@ export default function CustomerTicketsPage() {
                 <Table
                     columns={columns}
                     dataSource={tickets}
+                    onChange={handleTableChange}
                     rowKey="id"
                     loading={loading}
                     locale={{
@@ -182,7 +203,7 @@ export default function CustomerTicketsPage() {
                         style: { cursor: 'pointer' },
                     })}
                     style={{ background: '#fff', borderRadius: 8, border: '1px solid #d9e0e8' }}
-                    pagination={{ pageSize: 15, showTotal: (total) => `${total} tickets` }}
+                    pagination={{ ...pagination, showTotal: (total) => `${total} tickets` }}
                 />
             )}
 
