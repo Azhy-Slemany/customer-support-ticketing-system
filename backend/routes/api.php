@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [TicketController::class, 'createTicket'])->middleware('permission:support-tickets.create');
         Route::get('/{ticket}', [TicketController::class, 'getTicket'])->middleware('permission:support-tickets.view');
         Route::put('/{ticket}', [TicketController::class, 'updateTicket'])->middleware('permission:support-tickets.manage');
+        Route::patch('/{ticket}', [TicketController::class, 'updateTicketStatus'])->middleware('permission:support-tickets.manage');
         Route::delete('/{ticket}', [TicketController::class, 'deleteTicket'])->middleware('permission:support-tickets.manage');
 
         Route::post('/{ticket}/comments', [TicketController::class, 'createComment'])->middleware('permission:support-tickets.reply');;
