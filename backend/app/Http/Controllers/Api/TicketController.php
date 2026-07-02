@@ -21,17 +21,29 @@ class TicketController extends Controller
     public function getTickets(Request $request) {
         $perPage = $request->query('per_page', 20);
         $page = $request->query('page', 1);
+        $search = $request->query('search');
+        $status = $request->query('status');
+        $priority = $request->query('priority');
+        $category = $request->query('category');
+        $bookedDate = $request->query('booked_date');
 
         $user = $request->user();
-        if ($user->hasRole(["admin", "support"])) {
-            return Ticket::with(['customer'])
-                ->paginate(perPage: $perPage, page: $page);
-        } elseif ($user->hasRole("customer")) {
-            return Ticket::with(['customer'])
-                ->where('customer_id', $user->id)
-                ->paginate(perPage: $perPage, page: $page);
+        $query = Ticket::with(['customer']);
+        if ($user->hasRole("customer")) {
+            $query->where('customer_id', $user->id);
         }
-        return $this->errorResponse("Unauthorized", statusCode: 401);
+
+        return $query->when($status, function ($q, $status) {
+            return $q->where('status', $status);
+        })->when($priority, function ($q, $priority) {
+            return $q->where('priority', $priority);
+        })->when($category, function ($q, $category) {
+            return $q->where('category', $category);
+        })->when($bookedDate, function ($q, $bookedDate) {
+            return $q->whereDate('booked_at', $bookedDate);
+        })->when($search, function ($q, $search) {
+            return $q->whereLike('title', "%$search%");
+        })->paginate(perPage: $perPage, page: $page);
     }
 
     public function getTicket(Request $request, $id) {
