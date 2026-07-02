@@ -110,7 +110,7 @@ export default function AgentTicketDetailPage() {
         )
     }
 
-    const isClosed = ticket.status === 'Closed'
+    const isClosed = ticket.status === 'closed'
 
     return (
         <AppLayout activeKey="/agent/tickets">
@@ -142,7 +142,7 @@ export default function AgentTicketDetailPage() {
                         <Popconfirm
                             title="Close this ticket?"
                             description="The customer will no longer be able to add comments."
-                            onConfirm={() => updateStatus('Closed')}
+                            onConfirm={() => updateStatus('closed')}
                             okText="Close ticket"
                             okButtonProps={{ danger: true }}
                         >
@@ -224,10 +224,10 @@ export default function AgentTicketDetailPage() {
                                     style={{ marginBottom: 12 }}
                                 >
                                     <Select style={{ width: 200 }}>
-                                        <Option value="Open">Open</Option>
-                                        <Option value="In Progress">In Progress</Option>
-                                        <Option value="Resolved">Resolved</Option>
-                                        <Option value="Closed">Closed</Option>
+                                        <Option value="open">Open</Option>
+                                        <Option value="in_progress">In Progress</Option>
+                                        <Option value="resolved">Resolved</Option>
+                                        <Option value="closed">Closed</Option>
                                     </Select>
                                 </Form.Item>
 
@@ -250,7 +250,7 @@ export default function AgentTicketDetailPage() {
                                 size="small"
                                 style={{ marginLeft: 10 }}
                                 loading={updatingStatus}
-                                onClick={() => updateStatus('Open')}
+                                onClick={() => updateStatus('open')}
                             >
                                 Reopen
                             </Button>
