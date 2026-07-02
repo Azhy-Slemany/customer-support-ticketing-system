@@ -122,6 +122,30 @@ class TicketController extends Controller
         return $this->successResponse($ticket, 'Ticket updated successfully.');
     }
 
+    public function updateTicketStatus(Request $request, int $id) {
+        $ticket = Ticket::find($id);
+        if (!$ticket) {
+            return $this->errorResponse('Ticket not found', statusCode: 404);
+        }
+        $user = $request->user();
+        if ($user->hasExactRoles('customer') && $ticket->customer_id != $user->id) {
+            return $this->errorResponse("Unauthorized", statusCode: 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => ['required', Rule::in(TicketStatus::values())],
+        ]);
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+        $validated = $validator->validated();
+
+        $ticket->status = $validated['status'];
+        $ticket->save();
+
+        return $this->successResponse($ticket, 'Ticket updated successfully.');
+    }
+
     public function deleteTicket(Request $request, $id) {
         $ticket = Ticket::find($id);
         if (!$ticket) {
