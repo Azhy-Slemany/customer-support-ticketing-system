@@ -47,14 +47,12 @@ export interface TicketComment {
     created_at: string
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedData<T> {
     data: T[]
-    meta: {
-        current_page: number
-        last_page: number
-        per_page: number
-        total: number
-    }
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
 }
 
 export interface ApiError {
