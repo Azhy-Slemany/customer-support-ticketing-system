@@ -26,7 +26,7 @@ export default function AgentQueuePage() {
 
     // Filter state
     const [search, setSearch] = useState('')
-    const [statusFilter, setStatusFilter] = useState<string>('open_active') // default: open + in-progress
+    const [statusFilter, setStatusFilter] = useState<string>('open') // default: open
     const [categoryFilter, setCategoryFilter] = useState<TicketCategory | ''>('')
     const [priorityFilter, setPriorityFilter] = useState<TicketPriority | ''>('')
     const [bookedDate, setBookedDate] = useState<string>('')
@@ -39,7 +39,7 @@ export default function AgentQueuePage() {
         setLoading(true)
         setError(null)
         try {
-            // "open_active" is a convenience filter the backend maps to Open + In Progress
+            // "open" is a convenience filter the backend maps to Open
             const res = await api.get<{ data: Ticket[] }>('/tickets', {
                 params: {
                     search: search || undefined,
