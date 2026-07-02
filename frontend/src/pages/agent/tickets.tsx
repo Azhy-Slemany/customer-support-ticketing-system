@@ -91,7 +91,7 @@ export default function AgentQueuePage() {
             render: (priority: TicketPriority) => <PriorityBadge priority={priority} />,
             defaultSortOrder: 'ascend',
             sorter: (a, b) => {
-                const order = { Urgent: 0, High: 1, Normal: 2, Low: 3 }
+                const order = { urgent: 0, high: 1, normal: 2, low: 3 }
                 return (order[a.priority] ?? 4) - (order[b.priority] ?? 4)
             },
         },
