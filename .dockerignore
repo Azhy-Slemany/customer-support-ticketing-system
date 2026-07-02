@@ -1,0 +1,21 @@
+# Never copy local node_modules into the image —
+# the deps stage installs them fresh inside the container
+frontend/node_modules
+backend/vendor
+
+# Next.js build output (rebuilt inside container)
+frontend/.next
+
+# Local env files
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+backend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
