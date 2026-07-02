@@ -7,8 +7,6 @@ project-root/
   backend/          ← Laravel project
   frontend/         ← Next.js project
   docker/
-    nginx/
-      default.conf
     php/
       www.conf
   Dockerfile.backend
@@ -43,11 +41,11 @@ docker compose up --build -d
 ```
 
 This starts four containers:
+
 | Container  | Port | Purpose |
 |------------|------|---------|
 | db         | 5432 | PostgreSQL 16 |
 | backend    | —    | PHP 8.5 FPM |
-| nginx      | 8000 | Reverse proxy → PHP-FPM |
 | frontend   | 3000 | Next.js app |
 
 ### 4. Generate the Laravel app key
@@ -66,8 +64,8 @@ docker compose exec backend php artisan migrate:fresh --seed
 
 ### 6. Open the app
 
-- Frontend: http://localhost:3000
-- API:      http://localhost:8000/api
+- Frontend: <http://localhost:3000>
+- API:      <http://localhost:8000/api>
 
 ---
 
