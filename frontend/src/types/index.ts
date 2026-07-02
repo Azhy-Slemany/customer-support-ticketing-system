@@ -5,10 +5,10 @@ export interface User {
     roles: Role[]
 }
 
-export type Role = string[] | {
+export type Role = string | {
     id: number
     name: string
-}[]
+}
 
 export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed'
 export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent'
