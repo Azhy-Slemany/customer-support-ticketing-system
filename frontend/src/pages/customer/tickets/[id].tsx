@@ -113,18 +113,45 @@ export default function CustomerTicketDetailPage() {
 
                 {/* Left: conversation thread */}
                 <div style={{ display: 'grid', gap: 12 }}>
+                    {/* Original ticket description — pinned as the first item in the thread */}
+                    <div style={{
+                        background: '#fff',
+                        border: '1px solid #d9e0e8',
+                        borderRadius: 8,
+                        padding: 16,
+                        borderLeft: '3px solid #0f766e', // teal accent differentiates it from replies
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <Avatar
+                                size="small"
+                                icon={<UserOutlined />}
+                                style={{ background: '#687382' }}
+                            />
+                            <Text strong style={{ fontSize: 14 }}>Original Request</Text>
+                            <Text style={{ fontSize: 12, color: '#687382' }}>
+                                · {dayjs(ticket.created_at).format('MMM D, YYYY HH:mm')}
+                            </Text>
+                        </div>
+                        <Paragraph
+                            style={{ margin: 0, fontSize: 14, color: '#374151', whiteSpace: 'pre-line' }}
+                        >
+                            {ticket.description}
+                        </Paragraph>
+                    </div>
+
+                    {/* Comments */}
                     {ticket.comments && ticket.comments.length > 0 ? (
                         ticket.comments.map((comment) => (
                             <CommentCard key={comment.id} comment={comment} />
                         ))
                     ) : (
-                        <div style={{ background: '#fff', border: '1px solid #d9e0e8', borderRadius: 8, paddingTop: 100, color: '#687382', textAlign: 'center' }}>
+                        <div style={{ background: '#fff', border: '1px solid #d9e0e8', borderRadius: 8, paddingTop: 40, color: '#687382', textAlign: 'center' }}>
                             No replies yet. A support agent will respond shortly.
                         </div>
                     )}
 
                     {/* Add comment form — only visible when ticket isn't closed */}
-                    {ticket.status !== 'Closed' && (
+                    {ticket.status !== 'closed' && (
                         <div style={{ background: '#fff', border: '1px solid #d9e0e8', borderRadius: 8, padding: 16 }}>
                             <Text strong style={{ fontSize: 13 }}>Add a comment</Text>
                             {commentError && (
@@ -150,7 +177,7 @@ export default function CustomerTicketDetailPage() {
                         </div>
                     )}
 
-                    {ticket.status === 'Closed' && (
+                    {ticket.status === 'closed' && (
                         <div style={{ background: '#f4f7fa', border: '1px solid #d9e0e8', borderRadius: 8, padding: 14, color: '#687382', fontSize: 13 }}>
                             This ticket is closed. Open a new ticket if you need further help.
                         </div>
