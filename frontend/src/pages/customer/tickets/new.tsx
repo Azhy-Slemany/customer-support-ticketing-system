@@ -155,10 +155,9 @@ export default function NewTicketPage() {
                             name="contact_preference"
                             label={<span style={{ fontSize: 12, fontWeight: 700, color: '#687382' }}>CONTACT PREFERENCE</span>}
                         >
-                            <Select placeholder="No preference" size="large" allowClear>
+                            <Select placeholder="email" size="large" allowClear>
                                 <Option value="email">Email</Option>
                                 <Option value="phone">Phone call</Option>
-                                <Option value="">No preference</Option>
                             </Select>
                         </Form.Item>
                     </div>
