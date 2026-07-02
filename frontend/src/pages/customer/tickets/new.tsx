@@ -6,7 +6,7 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import AppLayout from '@/components/AppLayout'
 import api from '@/lib/axios'
-import type { ApiError } from '@/types'
+import type { ApiError, Ticket } from '@/types'
 import axios from 'axios'
 import dayjs from 'dayjs'
 
@@ -38,9 +38,9 @@ export default function NewTicketPage() {
                 // Send booked_at as ISO string if provided
                 booked_at: values.booked_at ? values.booked_at : undefined,
             }
-            const res = await api.post('/tickets', payload)
+            const res = await api.post<{ data: Ticket, message: string }>('/tickets', payload)
             // Navigate to the new ticket's detail page on success
-            router.push(`/customer/tickets/${res.data.id}`)
+            router.push(`/customer/tickets/${res.data.data.id}`)
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 const apiError = err.response?.data as ApiError
