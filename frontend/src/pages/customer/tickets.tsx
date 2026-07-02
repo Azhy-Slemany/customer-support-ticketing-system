@@ -137,24 +137,24 @@ export default function CustomerTicketsPage() {
                     allowClear
                 />
                 <Select value={statusFilter || undefined} placeholder="All statuses" onChange={(v) => setStatusFilter(v ?? '')} allowClear>
-                    <Option value="Open">Open</Option>
-                    <Option value="In Progress">In Progress</Option>
-                    <Option value="Resolved">Resolved</Option>
-                    <Option value="Closed">Closed</Option>
+                    <Option value="open">Open</Option>
+                    <Option value="in_progress">In Progress</Option>
+                    <Option value="resolved">Resolved</Option>
+                    <Option value="closed">Closed</Option>
                 </Select>
                 <Select value={categoryFilter || undefined} placeholder="All categories" onChange={(v) => setCategoryFilter(v ?? '')} allowClear>
-                    <Option value="Technical Issue">Technical Issue</Option>
-                    <Option value="Billing">Billing</Option>
-                    <Option value="Account Access">Account Access</Option>
-                    <Option value="Product Question">Product Question</Option>
-                    <Option value="Feature Request">Feature Request</Option>
-                    <Option value="Other">Other</Option>
+                    <Option value="technical_issue">Technical Issue</Option>
+                    <Option value="billing">Billing</Option>
+                    <Option value="account_access">Account Access</Option>
+                    <Option value="product_question">Product Question</Option>
+                    <Option value="feature_request">Feature Request</Option>
+                    <Option value="other">Other</Option>
                 </Select>
                 <Select value={priorityFilter || undefined} placeholder="All priorities" onChange={(v) => setPriorityFilter(v ?? '')} allowClear>
-                    <Option value="Low">Low</Option>
-                    <Option value="Normal">Normal</Option>
-                    <Option value="High">High</Option>
-                    <Option value="Urgent">Urgent</Option>
+                    <Option value="low">Low</Option>
+                    <Option value="normal">Normal</Option>
+                    <Option value="high">High</Option>
+                    <Option value="urgent">Urgent</Option>
                 </Select>
                 <DatePicker
                     placeholder="Booked date"
